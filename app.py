@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-"""
-EnviroHazardLI - Environmental hazard monitor for Long Island
-A Flask web application that assesses fire and flood risks for selected towns
-Run: python app.py
-"""
-
 import os
 import re
 import time
@@ -121,10 +114,6 @@ def init_model_and_encoders():
 init_model_and_encoders()
 
 def get_noaa_point(lat, lon):
-    """
-    Fetch NOAA forecast metadata and forecast/hourly payloads for a lat/lon.
-    Cache results briefly to avoid overloading the API.
-    """
     cache_key = f"noaa_{lat:.4f}_{lon:.4f}"
     cached = noaa_cache.get(cache_key)
     if cached:
@@ -163,10 +152,6 @@ def get_noaa_point(lat, lon):
         return None
 
 def get_elevation(lat, lon):
-    """
-    Query USGS elevation API. Cache results locally.
-    Returns elevation in meters; if the API fails, return a reasonable default.
-    """
     cache_key = f"elev_{lat:.4f}_{lon:.4f}"
     if cache_key in elev_cache:
         return elev_cache[cache_key]
@@ -188,11 +173,6 @@ def get_elevation(lat, lon):
         return 20.0
 
 def extract_weather_features(lat, lon, points_json):
-    """
-    Parse NOAA forecast/hourly JSON and derive a small set of weather features
-    we use for downstream logic and (optionally) the ML model.
-    Returns: (features_dict, hourly_periods_list)
-    """
     default = {
         "temperature": 70.0,
         "humidity": 60.0,
@@ -271,10 +251,6 @@ def extract_weather_features(lat, lon, points_json):
         return default, []
 
 def estimate_geo_features(lat, lon, elevation, weather_features):
-    """
-    Make some quick geographic/environmental estimates based on location and weather.
-    These are heuristic and designed to mimic what a richer dataset would provide.
-    """
     slope = float(np.random.uniform(0, 6))
     aspect = float(np.random.uniform(0, 360))
     center_lon = -73.0
@@ -335,9 +311,6 @@ def estimate_geo_features(lat, lon, elevation, weather_features):
     return other
 
 def make_fire_summary(town, fire_score, features, weather_features):
-    """
-    Generate a human-friendly fire hazard summary with suggested actions.
-    """
     summary = {"warnings": [], "context": "", "user_actions": [], "government_actions": [], "severity": "LOW"}
 
     temp = features.get("temperature", 70)
@@ -441,9 +414,6 @@ def make_fire_summary(town, fire_score, features, weather_features):
     return summary
 
 def make_flood_summary(town, flood_score, features, weather_features, other):
-    """
-    Create a flood risk summary and useful actions in plain language.
-    """
     summary = {"warnings": [], "context": "", "user_actions": [], "government_actions": [], "severity": "LOW"}
 
     precip24 = features.get("precipitation_last_24h", 0)
@@ -548,9 +518,6 @@ def make_flood_summary(town, flood_score, features, weather_features, other):
     return summary
 
 def make_activity_advice(fire_risk, flood_risk, features):
-    """
-    Recommend outdoor activities classified as safe / caution / not recommended.
-    """
     temp = features.get("temperature", 70)
     wind = features.get("wind_speed", 5)
     precip = features.get("precipitation_last_24h", 0)
@@ -654,10 +621,6 @@ def make_activity_advice(fire_risk, flood_risk, features):
     return advice
 
 def prepare_features_for_model(all_features):
-    """
-    Turn our features dict into a numpy array suitable for the ML model,
-    using the loaded scaler and one-hot encoder when available.
-    """
     global std_scaler, onehot_encoder, feat_names, numeric_features, categorical_features
 
     if feat_names:
@@ -715,10 +678,6 @@ def prepare_features_for_model(all_features):
     return X, num_cols_local, cat_cols_local
 
 def simple_rule_risks(features):
-    """
-    A fallback heuristic to estimate fire and flood risk when the ML model isn't available.
-    It's intentionally simple and conservative.
-    """
     t = features.get("temperature", 70)
     humid = features.get("humidity", 60)
     wind = features.get("wind_speed", 5)
@@ -747,14 +706,6 @@ def simple_rule_risks(features):
     return {"fire_risk": fire_risk, "flood_risk": flood_risk, "hazard_class": hazard}
 
 def analyze_location(town):
-    """
-    Main orchestration for a single town:
-    - fetch NOAA and elevation
-    - derive features
-    - call model (or rules) for scores
-    - produce summaries and activity recommendations
-    Returns (result_dict, error_or_none)
-    """
     if town not in TOWNS:
         return None, "Unknown town"
 
