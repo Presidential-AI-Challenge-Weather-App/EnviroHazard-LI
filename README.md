@@ -64,8 +64,7 @@ pip
 
 ## **Installation**
 bash
-git clone https://github.com/yourusername/EnviroHazardLI.git
-cd EnviroHazardLI
+git clone https://github.com/Congressional-App-Challenge-Weather-App/EnviroHazardLI/
 pip install flask requests numpy pandas scikit-learn tensorflow
 
 3. **Run the application**
