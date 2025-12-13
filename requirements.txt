@@ -1,6 +1,6 @@
-flask
-numpy
-pandas
-requests
-tensorflow
-scikit-learn
+flask==2.3.3
+requests==2.31.0
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.3.0
+Werkzeug==2.3.7
