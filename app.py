@@ -96,6 +96,163 @@ def calculate_risks(forecast):
         "flood_score": flood_score
     }
 
+def get_fire_summary(fire_score, temp, wind, forecast):
+    """Detailed fire risk analysis"""
+    summary = {
+        "severity": "LOW",
+        "warnings": [],
+        "context": "",
+        "user_actions": [],
+        "government_actions": []
+    }
+    
+    if fire_score > 0.7:
+        summary["severity"] = "HIGH"
+        summary["warnings"].append("High fire risk - Dangerous for outdoor burning")
+    elif fire_score > 0.4:
+        summary["severity"] = "MODERATE"
+        summary["warnings"].append("Moderate fire risk - Exercise caution")
+    else:
+        summary["severity"] = "LOW"
+        summary["warnings"].append("Low fire risk - Conditions look favorable")
+    
+    # Context
+    parts = ["Fire Risk Analysis:"]
+    if temp > 95:
+        parts.append(f"Very hot ({temp}°F) raises ignition risk.")
+    elif temp > 85:
+        parts.append(f"Warm ({temp}°F) and drying conditions.")
+    else:
+        parts.append(f"Temperature ({temp}°F) is comfortable.")
+    
+    if wind > 25:
+        parts.append(f"High winds ({wind} mph) could spread fires rapidly.")
+    elif wind > 15:
+        parts.append(f"Moderate winds ({wind} mph) may accelerate spread.")
+    else:
+        parts.append(f"Light winds ({wind} mph) limit fire spread.")
+    
+    summary["context"] = " ".join(parts)
+    
+    # Actions based on severity
+    if fire_score > 0.6:
+        summary["user_actions"] = [
+            "No outdoor burning - cancel campfires and burn permits",
+            "Clear dry brush 30 feet from structures",
+            "Water vulnerable landscaping",
+            "Sign up for local emergency alerts",
+            "Prepare an evacuation kit"
+        ]
+        summary["government_actions"] = [
+            "Issue burn bans and public alerts",
+            "Stage firefighting resources in high-risk zones",
+            "Increase patrols and inspections",
+            "Deploy public safety messaging"
+        ]
+    elif fire_score > 0.3:
+        summary["user_actions"] = [
+            "Delay non-essential outdoor fires",
+            "Clean gutters and remove dry debris",
+            "Supervise grills carefully",
+            "Water lawns and plants regularly"
+        ]
+        summary["government_actions"] = [
+            "Increase monitoring and public education",
+            "Prepare resources for rapid deployment",
+            "Issue guidance on defensible space"
+        ]
+    else:
+        summary["user_actions"] = [
+            "Maintain safe practices with open flames",
+            "Regularly remove dry leaf litter",
+            "Stay informed during dry spells"
+        ]
+        summary["government_actions"] = [
+            "Continue routine inspections",
+            "Promote fire safety programs"
+        ]
+    
+    return summary
+
+def get_flood_summary(flood_score, forecast):
+    """Detailed flood risk analysis"""
+    summary = {
+        "severity": "LOW",
+        "warnings": [],
+        "context": "",
+        "user_actions": [],
+        "government_actions": []
+    }
+    
+    if flood_score > 0.7:
+        summary["severity"] = "HIGH"
+        summary["warnings"].append("High flood risk - Significant flooding expected")
+    elif flood_score > 0.4:
+        summary["severity"] = "MODERATE"
+        summary["warnings"].append("Moderate flood risk - Localized flooding possible")
+    else:
+        summary["severity"] = "LOW"
+        summary["warnings"].append("Low flood risk - Normal drainage")
+    
+    # Context
+    short = forecast.get("shortForecast", "").lower() if forecast else ""
+    detailed = forecast.get("detailedForecast", "").lower() if forecast else ""
+    
+    parts = ["Flood Risk Analysis:"]
+    if "heavy" in short or "heavy" in detailed:
+        parts.append("Heavy rainfall may overwhelm drainage systems.")
+    elif "rain" in short or "rain" in detailed:
+        parts.append("Rainfall creating elevated runoff.")
+    else:
+        parts.append("Little rain expected - low flood risk.")
+    
+    if "thunderstorm" in short or "thunderstorm" in detailed:
+        parts.append("Thunderstorms can produce rapid flooding.")
+    
+    summary["context"] = " ".join(parts)
+    
+    # Actions based on severity
+    if flood_score > 0.6:
+        summary["user_actions"] = [
+            "Do not drive through flooded roads - Turn Around, Don't Drown",
+            "Move to higher ground if in low areas",
+            "Elevate electronics and valuables",
+            "Monitor local emergency alerts",
+            "Keep devices charged for emergencies"
+        ]
+        summary["government_actions"] = [
+            "Activate emergency operations and rescue teams",
+            "Close flooded roads and deploy signage",
+            "Stage swift-water rescue resources",
+            "Issue emergency notifications"
+        ]
+    elif flood_score > 0.3:
+        summary["user_actions"] = [
+            "Avoid flood-prone spots and underpasses",
+            "Clear gutters and downspouts",
+            "Move vehicles to higher ground if needed",
+            "Clear yard drains",
+            "Test sump pumps"
+        ]
+        summary["government_actions"] = [
+            "Inspect and clean storm drains",
+            "Pre-position pumps and barriers",
+            "Monitor rainfall and stream levels",
+            "Issue flood watches"
+        ]
+    else:
+        summary["user_actions"] = [
+            "Keep gutters clear",
+            "Know your local flood risk zone",
+            "Maintain yard drainage"
+        ]
+        summary["government_actions"] = [
+            "Routine storm drain maintenance",
+            "Promote flood preparedness education"
+        ]
+    
+    return summary
+
 def get_warnings(risks, forecast):
     """Generate warnings based on risk levels"""
     fire_warnings = []
@@ -149,6 +306,8 @@ def index():
     flood_risk = "LOW"
     fire_warnings = []
     flood_warnings = []
+    fire_summary = None
+    flood_summary = None
     activities = None
     error_message = None
     
@@ -163,6 +322,14 @@ def index():
                 fire_risk = risks["fire_risk"]
                 flood_risk = risks["flood_risk"]
                 fire_warnings, flood_warnings = get_warnings(risks, forecast)
+                
+                # Get detailed summaries
+                temp = forecast.get("temperature", 70) if forecast else 70
+                wind_str = forecast.get("windSpeed", "5 mph") if forecast else "5 mph"
+                wind = int(re.search(r'(\d+)', wind_str).group(1)) if re.search(r'(\d+)', wind_str) else 5
+                
+                fire_summary = get_fire_summary(risks["fire_score"], temp, wind, forecast)
+                flood_summary = get_flood_summary(risks["flood_score"], forecast)
                 activities = get_activities(risks, forecast)
             except Exception as e:
                 error_message = f"Error getting weather data: {str(e)}"
@@ -179,10 +346,11 @@ def index():
         fire_warnings=fire_warnings,
         flood_risk=flood_risk,
         flood_warnings=flood_warnings,
+        fire_summary=fire_summary,
+        flood_summary=flood_summary,
         activities=activities,
         error_message=error_message)
 
-# For Vercel
 app_handler = app
 
 if __name__ == "__main__":
