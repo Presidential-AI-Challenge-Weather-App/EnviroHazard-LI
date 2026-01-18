@@ -1,7 +1,7 @@
 #  EnviroHazardLI  
-### AI-Assisted Environmental Hazard Monitoring for Long Island
+### AI Assisted Environmental Hazard Monitoring for Long Island
 
-EnviroHazardLI is a real-time environmental hazard assessment tool designed specifically for Long Island. It combines live weather data, elevation analysis, and simple machine-learning or rule-based calculations to provide clear fire and flood hazard insights for residents, local governments, and outdoor activity planning.
+EnviroHazardLI is a real time environmental hazard assessment tool designed specifically for Long Island. It combines live weather data, elevation analysis, and simple machine-learning or rule-based calculations to provide clear fire and flood hazard insights for residents, local governments, and outdoor activity planning.
 
 ---
 
@@ -18,14 +18,14 @@ Uses precipitation amounts, soil saturation logic, elevation, drainage capacity,
 ---
 
 ##  AI-Assisted Predictions
-Uses a **lightweight neural network** if a trained model is available  
-If not, the system falls back to a **robust rule-based engine**
+Uses a neural network if a trained model is available  
+If not, the system falls back to an easier engine
 
 ---
 
 ##  Integrated Data Sources
 
-### **NOAA Weather API**
+### **NOAA Weather API
 Live forecasts  
 Hourly temperature, humidity, wind, dew point, and precipitation indicators  
 
@@ -36,23 +36,22 @@ Cached since terrain does not change
 ### **Derived Environmental Metrics**
 Estimated soil moisture  
 Runoff index  
-Drought score  
-Simplified urbanization factors  
+Drought score 
 
 ---
 
-##  Actionable Hazard Recommendations
+##  Hazard Recommendations
 **Resident Guidance** – Steps to stay safe  
 **Government Recommendations** – Proactive community-level actions  
-**Outdoor Activity Ratings** – 12 activities scored as Safe / Caution / Avoid  
+**Outdoor Activity Ratings** – Activities scored as Safe / Caution / Avoid  
 
 ---
 
-## Interactive Visualizations
+## Visualizations
 Leaflet.js interactive dark map
 24-hour temperature line chart  
 24-hour wind-speed bar chart  
-Color-coded hazard severity badges  
+Color-coded hazards  
 
 ---
 
@@ -61,30 +60,17 @@ Analyzes:
 Temperature extremes and heat stress
 Humidity levels and fuel dryness
 Wind speeds and fire spread potential
-Drought duration and vegetation fuel loads
-
-Generates context-aware messages and severity-scaled actions:
-**EXTREME** (>85%): Emergency protocols, evacuations, burn bans
-**HIGH** (70-85%): Preventive measures, increased patrols
-**MODERATE** (40-70%): Caution advisories, maintenance
-**LOW** (<40%): Standard fire safety practices
+Drought duration and vegetation
 
 #### **Flood Summaries**
 Analyzes:
 Rainfall amounts and intensity
 Soil saturation and absorption capacity
 Topography and elevation vulnerabilities
-Urban infrastructure and drainage systems
 Stream and waterway capacity
 
-Generates context-aware messages and severity-scaled actions:
-**EXTREME** (>85%): Evacuations, road closures, emergency operations
-**HIGH** (70-85%): Flood barriers, rescue team staging
-**MODERATE** (40-70%): Monitoring, drainage clearing
-**LOW** (<40%): Routine maintenance, preparedness
-
 #### **Activity Recommendations**
-Evaluates 12 outdoor activities based on:
+Evaluates outdoor activities based on:
 Temperature comfort ranges
 Wind safety thresholds
 Fire risk levels
@@ -92,10 +78,10 @@ Flood risk levels
 Humidity conditions
 Precipitation amounts
 
-Each activity categorized as:
-**Safe** - All conditions favorable
-**Caution** - Some risk factors present, specific warnings given
-**Not Recommended** - Unsafe conditions detected
+Each activity is categorized as:
+**Safe**
+**Caution**
+**Not Recommended**
 
 ---
 
@@ -120,8 +106,6 @@ Currently supports 12 Long Island towns with precise coordinates:
 
 ---
 **Built for Long Island communities**
-
-Stay safe, stay informed, protect our environment. 
 
 --- 
 **Maintained By:** EnviroHazardLI Team - Lucas Kuriakose and Michael Wagner
